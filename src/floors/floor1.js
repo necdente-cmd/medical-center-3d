@@ -9,6 +9,9 @@ import { buildStairsUp, buildStairsDown, railing } from '../builders/stairs.js';
 import { buildElevator } from '../builders/elevator.js';
 import { aquarium } from '../builders/aquarium.js';
 import { linoleumWhite, linoleumHall, linoleumCorr, linoleumRoom } from '../materials.js';
+import { buildCeiling } from '../builders/ceiling.js';
+import { buildPlinth } from '../builders/plinth.js';
+import { sanitizerDispenser, entranceMat, wallClock, fireExtinguisher, infoStand } from '../builders/extras.js';
 
 const ROOMS = [
   { name:'Прививочный кабинет', area:'21.0', x1:6.5, x2:9.0, z1:0.5, z2:7.0, type:'exam_L' },
@@ -76,6 +79,16 @@ export function buildFloor1() {
 
     if (!r.noWalls && r.type !== 'exam_R' && r.type !== 'exam_L' && r.type !== 'cashier') {
       makeRoomWalls(group, r);
+    }
+
+    // Потолок со светильниками (кроме лестниц и лифта)
+    if (r.type !== 'stairs_up' && r.type !== 'stairs_dn' && r.type !== 'elevator') {
+      buildCeiling(group, r.x1, r.x2, r.z1, r.z2, WALL_H);
+    }
+
+    // Плинтус (только у комнат со стенами)
+    if (!r.noWalls && r.type !== 'exam_R' && r.type !== 'exam_L' && r.type !== 'cashier') {
+      buildPlinth(group, r.x1, r.x2, r.z1, r.z2);
     }
 
     // мебель по типу
@@ -238,6 +251,23 @@ export function buildFloor1() {
   makeWindow(group, 19.0, 14.5, 22.0, 14.5);
   makeWindow(group, 24.5, 10.8, 24.5, 12.2);
   makeWindow(group, 24.5, 12.9, 24.5, 14.3);
+
+  /* ---------- ДЕКОР ---------- */
+  // Дозаторы антисептика у входа
+  sanitizerDispenser(group, 11.8, 1.2, 0.55, 0);
+  sanitizerDispenser(group, 14.8, 1.2, 0.55, 0);
+
+  // Коврик у входа
+  entranceMat(group, 13.3, 1.6, 2.6, 1.4, 0);
+
+  // Часы в холле — на северной стене
+  wallClock(group, 17.5, 2.1, 0.55, 0);
+
+  // Огнетушитель в коридоре
+  fireExtinguisher(group, 1.2, 10.2, 0);
+
+  // Информационный стенд в холле
+  infoStand(group, 12.5, 6.8, Math.PI);
 
   return { group, roomFloors };
 }
